@@ -1,5 +1,5 @@
 from django.shortcuts import render,get_object_or_404,redirect
-from .models import Blog
+from .models import Blog, Comment
 from django.utils import timezone
 from .form import Blogform
 # Create your views here.
@@ -10,7 +10,24 @@ def home(request):
 
 def detail(request,blog_id):
     blog = get_object_or_404(Blog,pk=blog_id)
-    return render(request,'detail.html',{'blog':blog})
+    comments = Comment.objects.filter(blog=blog)
+    like_num = len(blog.like.all())
+    return render(request,'detail.html',{'blog':blog, 'comments':comments, 'likes':like_num})
+
+def commenting(request,blog_id):
+    new_comment = Comment()
+    new_comment.blog = get_object_or_404(Blog,pk=blog_id)
+    new_comment.author = request.user
+    new_comment.body = request.POST.get('body')
+    new_comment.save()
+    return redirect('/BlogApp/' + str(blog_id))
+
+def like(request,blog_id):
+    blog = get_object_or_404(Blog,pk=blog_id)
+    blog.like.add(request.user)
+    blog.save()
+
+    return redirect('/BlogApp/' + str(blog_id))
 
 def new(request):
     if request.method=='POST':

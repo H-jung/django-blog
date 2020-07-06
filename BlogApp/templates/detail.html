@@ -3,7 +3,7 @@
 <h3>제목 : {{blog.title}}</h3>
 
 <hr>
-
+<p>좋아요 {{likes}}개</p>
 <p>{{blog.pub_date}}</p>
 
 <p>{{blog.body}}</p>
@@ -16,3 +16,22 @@
 <a href="{%url 'home'%}">메인 홈</a>
 <a href="{%url 'edit' blog.id%}">수정하기</a>
 <a href="{%url 'delete' blog.id%}">삭제하기</a>
+
+<hr>
+{% for comment in comments %}
+<br>작성자: {{comment.author}}
+<br>내용: {{comment.body}}
+<br>{{comment.pub_date}}
+<hr>
+
+{% endfor %}
+
+<form action="/BlogApp/commenting/{{blog.id}}" method="POST">
+    {% csrf_token %}
+    <input type="text" name="body">
+    <button type="submit">작성</button>
+</form>
+
+<form action="/BlogApp/like/{{blog.id}}" method="get">
+    <button type="submit">좋아요</button>
+</form>
